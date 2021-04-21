@@ -19,8 +19,6 @@ export default {
     },
     socketRecieve: {
       type: Object,
-      // type: Array,
-      // default: ()=>[]
     }
   },
   data(){
@@ -35,9 +33,6 @@ export default {
     this.init();
   },
   methods: {
-    destroy(){
-       this.chart.dispose();
-    },
     init(){
       let chart = am4core.create(this.$refs.chartdiv, am4charts.XYChart);
 
@@ -75,12 +70,6 @@ export default {
   watch:{
     socketRecieve() {
       if (this.chart){
-        // this.chartCurrentData=.map(item=>{
-        //   return {
-        //     val:item.P,
-        //     time: item.TS
-        //   }
-        // })
         this.chartCurrentData.val = this.socketRecieve.P;
         this.chartCurrentData.time = this.socketRecieve.TS*1000;
         this.chart.addData(this.chartCurrentData)
@@ -93,7 +82,7 @@ export default {
   },
   beforeDestroy() {
     if (this.chart) {
-     this.destroy()
+     this.chart.dispose();
     }
   }
 }

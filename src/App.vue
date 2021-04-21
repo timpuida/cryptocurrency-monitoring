@@ -5,11 +5,8 @@
         <img src="@/assets/images/LOGO.svg" alt="CRYPTO">
       </div>
     </div>
-   
     <div class="main-content">
-      <!-- <div > -->
         <h1 class="container dark-grey d-md-none">Панель котировок</h1>
-      <!-- </div> -->
       <div class="plot">
         <div class="currency-title">
           <p class="h1">USD | {{currentCurrency}}</p>
@@ -19,10 +16,8 @@
             :chartProps="ohlcvData"
             :socketRecieve="dataRecieved">
             </amchart>
-             <!-- <button @click="add">add</button> -->
              <br>
              <br>
-             <button @click="closeSocket">Close socket</button>
           </div>
         </div>
       </div>
@@ -46,7 +41,7 @@
               <td>USD | {{currency.name}}</td>
               <td>
                 <span class="icon"><img :src="require('./assets/images/'+currency.icon+'.svg')" alt=""></span>
-              {{currency.change | toPrecision(2)}} %</td>
+              {{currency.change | toPrecision(2) | abs()}} %</td>
               <td> {{currency.price}} </td>
             </tr>
           </tbody>
@@ -72,26 +67,20 @@ export default {
           name: 'BTC',
           change: '0',
           icon: 'up',
-          price: '57093.95',
+          price: '0',
         },
         {
           name: 'BCH',
           change: '0',
           icon: 'up',
-          price: '964',
+          price: '0',
         },
         {
           name: 'ETH',
           change: '0',
           icon: 'up',
-          price: '964',
+          price: '0',
         },
-        {
-          name: 'XRP',
-          change: '0',
-          icon: 'up',
-          price: '964',
-        }
       ],
       apiKey: process.env.VUE_APP_KEY,
       baseUrl: 'wss://streamer.cryptocompare.com/v2',
@@ -100,11 +89,11 @@ export default {
       ohlcvData: null,
       subscriptionMessage: {
           "action": "SubAdd",
-          "subs": ["0~Coinbase~BTC~USD", "0~Coinbase~BCH~USD", "0~Coinbase~ETH~USD","0~Coinbase~XRP~USD"]
+          "subs": ["0~Coinbase~BTC~USD", "0~Coinbase~BCH~USD", "0~Coinbase~ETH~USD"]
       },
       unSubscriptionMessage: {
           "action": "SubRemove",
-         "subs": ["0~Coinbase~BTC~USD", "0~Coinbase~BCH~USD", "0~Coinbase~ETH~USD","0~Coinbase~XRP~USD"]
+         "subs": ["0~Coinbase~BTC~USD", "0~Coinbase~BCH~USD", "0~Coinbase~ETH~USD"]
       },
       socket: null
 
@@ -118,8 +107,6 @@ export default {
     changeCurrency(val){
        this.currentCurrency=val;
       this.getOHLCV(val);
-      // this.unsubscribe(val.unsubscriptionMessage);
-      // this.recieveCurrentData(val.subscriptionMessage)
     },
     recieveCurrentData(){
       const socket = new WebSocket(this.baseUrl+'?api_key='+this.apiKey);
@@ -128,10 +115,8 @@ export default {
       }
       socket.onmessage = (e) => {
         const msg = JSON.parse(e.data)
-        // console.log(msg);
         this.currencies = this.currencies.map((item)=>{
           if (item.name===msg.FSYM){
-            
             let diff = msg.P-item.price
             if((diff) !== 0){
               diff>0?item.icon='up':item.icon='down';
@@ -139,60 +124,38 @@ export default {
               item.change = Math.round((diff)/item.price *100 *100)/100;
               item.price = msg.P;
             }
-            // console.log('msg.P:',msg.P,'item.price: ',item.price, ' (msg.P-item.price)/item.price',(msg.P-item.price)/item.price);
          }
           return item 
         })
         if (msg.TYPE==='0' && msg.FSYM===this.currentCurrency){
           this.dataRecieved=msg;
-           console.log('fine: ',msg.FSYM);
-          //  console.log(msg);
-        }else{
-          console.log(`debug ${msg.TYPE}`);
-          // console.log(msg)
         }
       }
       socket.onclose = (e) => {
-        console.log(`${e.code}; ${e.reason}; from mount`);
+        console.log(`${e.code}; ${e.reason};`);
       }
-      socket.onerror = (err) => console.log(err.message);
+      socket.onerror = (err) => alert(err);
       this.socket = socket;
     },
-    closeSocket(){
-      if (this.socket){
-
-        console.log('close click');
-        this.socket.send(JSON.stringify(this.unSubscriptionMessage))
-        this.socket.close(1000, 'btn clicked')
-        this.socket.onclose = (e) => {
-          console.log(`${e.code}; ${e.reason} reactive`);
-        }
-      }
-    },
-    // unsubscribe(){
-    //   this.socket.send(JSON.stringify(this.unSubscriptionMessage))
-    //   console.log('this.unsubscribe:',JSON.stringify(unsubscribeMsg));
-    // },
-    getOHLCV(cur){
+    getOHLCV(curr){
       const options = {
         params: {
-          fsym: cur,
+          fsym: curr,
           tsym: 'USD',
-          limit: 99,
+          limit: 299,
         }
       }
       this.$axios.get(this.restUrl,options)
-      .then((res)=>{
-          console.log(res);
-          // console.log( Array.isArray(res.data.Data.Data))
-          this.ohlcvData = res.data.Data.Data;
-        })
-      .catch((err)=>console.dir(err))
+      .then((res)=> this.ohlcvData = res.data.Data.Data)
+      .catch((err)=>console.log(err))
     }
   },
   filters: {
     toPrecision(val,to){
       return Number(val).toFixed(to);
+    },
+    abs(val){
+      return Math.abs(val)
     }
   }
 }
