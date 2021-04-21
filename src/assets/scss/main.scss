@@ -1,0 +1,153 @@
+$darkGrey: #191A20;
+$lightGrey: #757679;
+$green: #2CA15B;
+$red: #A12C2C;
+
+*{
+    box-sizing: border-box;
+}
+html{
+    font-size: 12px;
+}
+body{
+    background: $darkGrey;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    margin: 0;
+    padding: 0;
+    
+}
+h1, .h1{
+    font-size: 14px;
+    color: #fff;
+    padding: 5px;
+    font-weight: 600;
+    margin-top: 0;
+
+}
+.d-none{
+    display: none;
+}
+.dark-grey{
+    background-color: $darkGrey;
+}
+h2{
+    font-size: 1rem;
+}
+.container{
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.plot{
+    background: #fff;
+}
+.currency-title, #chart, .chartdiv{
+    height: 100%;
+    background: #fff;
+}
+.header{
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 2px solid #000;
+    // background: $darkGrey;
+    .logo{
+        width: 64px;
+    }
+}
+.currency-title{
+    text-align: center;
+    color: $darkGrey;
+    .h1{
+        color: inherit;
+    }
+}
+.table{
+    color: #fff;
+    width: 100%;
+    background: $darkGrey;
+    padding-top: 15px;
+    border: none;
+    border-collapse: collapse;
+
+}
+tr{
+    cursor: pointer;
+}
+th{
+    color: $lightGrey;
+    // font-weight: 400;
+}
+td{
+    font-weight: 600;
+    font-size: 20px;
+    border: none;
+}
+td,th{
+    text-align: center;
+    &:first-child{
+        text-align: left;
+        padding-left: 15px;
+    }
+    &:last-child{
+        text-align: right;
+        padding-right: 15px;
+    }
+}
+.main-content{
+    display: flex;
+    flex-direction: column;
+}
+.active{
+    background: linear-gradient(90deg, rgba(31, 70, 106, 0.88) 0%, #191A20 138.3%);
+}
+@media screen and (min-width:768px){
+    .d-md-none{
+        display: none;
+    }
+    .d-md-block{
+        display: block;
+    }
+    .header{
+        border-width: 10px;
+    }
+    .container{
+        padding-left: 35px;
+        padding-right: 35px;
+    }
+    
+    .main-content{
+        flex-direction: row;
+        .plot{
+            order: 1;
+            width: 73%;
+            // padding-right: 35px;
+    //         // flex-basis: 80%;
+    //         flex: 1 1 80%;
+        }
+        .table, h1{
+    //         flex: 0 1;
+            // width: auto;
+        }
+    }
+    td,th{
+        &:first-child{
+            padding-left: 35px;
+        }
+        &:last-child{
+            padding-right: 35px;
+        }
+    }
+    .left-side{
+        border-right: 10px solid #000;
+        width: 27%;
+        h1{
+            border-bottom:3px solid #000;
+        }
+    }
+    .plot{
+        min-height: 70vh;
+    }
+}
