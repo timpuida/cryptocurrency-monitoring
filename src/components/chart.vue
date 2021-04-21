@@ -76,6 +76,7 @@ export default {
       }
     },
     chartProps(){
+      this.chart.dispose();
       this.init()
     }
       

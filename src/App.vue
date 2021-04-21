@@ -41,7 +41,7 @@
               <td>USD | {{currency.name}}</td>
               <td>
                 <span class="icon"><img :src="require('./assets/images/'+currency.icon+'.svg')" alt=""></span>
-              {{currency.change | toPrecision(2) | abs()}} %</td>
+              {{currency.change | abs() | toPrecision(2) }} %</td>
               <td> {{currency.price}} </td>
             </tr>
           </tbody>
@@ -82,9 +82,6 @@ export default {
           price: '0',
         },
       ],
-      apiKey: process.env.VUE_APP_KEY,
-      baseUrl: 'wss://streamer.cryptocompare.com/v2',
-      restUrl:'https://min-api.cryptocompare.com/data/v2/histominute',
       dataRecieved: null,
       ohlcvData: null,
       subscriptionMessage: {
@@ -95,7 +92,6 @@ export default {
           "action": "SubRemove",
          "subs": ["0~Coinbase~BTC~USD", "0~Coinbase~BCH~USD", "0~Coinbase~ETH~USD"]
       },
-      socket: null
 
     }
   },
@@ -109,7 +105,7 @@ export default {
       this.getOHLCV(val);
     },
     recieveCurrentData(){
-      const socket = new WebSocket(this.baseUrl+'?api_key='+this.apiKey);
+      const socket = new WebSocket(process.env.VUE_APP_BASEURL+'?api_key='+process.env.VUE_APP_KEY);
       socket.onopen =() => {
         socket.send(JSON.stringify(this.subscriptionMessage))
       }
@@ -117,7 +113,7 @@ export default {
         const msg = JSON.parse(e.data)
         this.currencies = this.currencies.map((item)=>{
           if (item.name===msg.FSYM){
-            let diff = msg.P-item.price
+            const diff = msg.P-item.price
             if((diff) !== 0){
               diff>0?item.icon='up':item.icon='down';
 
@@ -135,7 +131,6 @@ export default {
         console.log(`${e.code}; ${e.reason};`);
       }
       socket.onerror = (err) => alert(err);
-      this.socket = socket;
     },
     getOHLCV(curr){
       const options = {
@@ -145,7 +140,7 @@ export default {
           limit: 299,
         }
       }
-      this.$axios.get(this.restUrl,options)
+      this.$axios.get(process.env.VUE_APP_RESTURL,options)
       .then((res)=> this.ohlcvData = res.data.Data.Data)
       .catch((err)=>console.log(err))
     }
